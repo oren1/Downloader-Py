@@ -42,9 +42,4 @@ def getDownloadUrl(url, resolution = '360p'):
             if (stream.mime_type == 'video/mp4' and stream.resolution == resolution and stream.is_progressive == True):
                 return stream.url
 
-class Content:
-  def __init__(self, url):
-    self.url = url
 
-  def __str__(self) -> str:
-      return f'content url is: {self.url}'  
