@@ -7,30 +7,41 @@ from firebase_admin import initialize_app
 from pytube import YouTube, exceptions
 from urllib.parse import unquote
 import json
+from flask import jsonify 
 
 initialize_app()
 
 @https_fn.on_request(cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"]))
 def get_download_url(req: https_fn.Request) -> https_fn.Response:
-   
+    
+    content_type = req.headers["content-type"]
+
     # grab the args
-    if req.method == 'POST':
-        encodedOriginalUrl = req.form.get('url')
-        quality = req.form.get('quality')
-    else:
-        encodedOriginalUrl = req.args.get('url')
-        quality = req.args.get('quality')
+    if content_type == 'application/json':
+        request_json = req.get_json(silent=True)
+        if request_json and "url" in request_json:
+            encodedOriginalUrl = request_json.get('url')
+            quality = request_json.get('quality')
+
+    elif content_type == "application/x-www-form-urlencoded":       
+         if req.method == 'POST':
+            encodedOriginalUrl = req.form.get('url')
+            quality = req.form.get('quality')
+         elif req.method == 'GET':
+            encodedOriginalUrl = req.args.get('url')
+            quality = req.args.get('quality')
            
 
     if encodedOriginalUrl is None:
-        return https_fn.Response("No url parameter provided", status=400)
+        # return https_fn.Response("No url parameter provided", status=400)
+            return jsonify({'error': 'No url parameter provided'})
     
     if quality is None:
         quality = '720p'
 
     # the url is sent encoded so we need to decode it
     originalUrl = unquote(encodedOriginalUrl)
-
+    
     # get a downloadable url
     try:
         downloadUrl = getDownloadUrl(originalUrl, quality)
@@ -39,11 +50,9 @@ def get_download_url(req: https_fn.Request) -> https_fn.Response:
     except:
         return https_fn.Response(json.dumps({'error': 'this video can`t be downloaded'}))
 
-    # return the downloadable url in the response
-    responseObject = json.dumps({'error': None, 'url': downloadUrl})
-
-    return https_fn.Response(responseObject)
-
+    responseObject = {'error': None, 'url': downloadUrl}
+    return jsonify(responseObject)
+    
 
 def getDownloadUrl(url, resolution = '360p'):
         streams = YouTube(url).streams
