@@ -49,7 +49,7 @@ def get_download_url(req: https_fn.Request) -> https_fn.Response:
     except exceptions.AgeRestrictedError:
         return https_fn.Response(json.dumps({'error': 'this video is age restricted, and can`t be accessed'}))
     except:
-        return https_fn.Response(json.dumps({'error': 'this video can`t be downloaded'}))
+        return https_fn.Response(json.dumps({'error': 'this video is restricted and can`t be downloaded'}))
 
     responseObject = {'error': None, 'url': downloadUrl}
     return jsonify(responseObject)
