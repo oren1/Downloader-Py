@@ -16,7 +16,7 @@ initialize_app()
 def get_download_url(req: https_fn.Request) -> https_fn.Response:
     
     content_type = req.headers["content-type"]
-    print("content_type", content_type)
+   
     # grab the args
     if content_type == 'application/json':
         request_json = req.get_json(silent=True)
@@ -39,8 +39,7 @@ def get_download_url(req: https_fn.Request) -> https_fn.Response:
     
     if quality is None:
         quality = '720p'
-    print("encodedOriginalUrl", encodedOriginalUrl)
-    print("quality", quality)
+
 
     # the url is sent encoded so we need to decode it
     originalUrl = unquote(encodedOriginalUrl)
@@ -58,9 +57,8 @@ def get_download_url(req: https_fn.Request) -> https_fn.Response:
 
 def getDownloadUrl(url, resolution = '360p'):
         validUrl = getValidUrl(url)
-        print('validUrl', validUrl)
         streams = YouTube(validUrl).streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()   
-             
+
         return streams.first().url  
 
 def getValidUrl(url):
