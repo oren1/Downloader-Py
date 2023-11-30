@@ -59,11 +59,8 @@ def get_download_url(req: https_fn.Request) -> https_fn.Response:
 def getDownloadUrl(url, resolution = '360p'):
         validUrl = getValidUrl(url)
         print('validUrl', validUrl)
-        streams = YouTube(validUrl).streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()
-        for stream in streams:
-            if stream.resolution == resolution:
-                return stream.url
-        
+        streams = YouTube(validUrl).streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()   
+             
         return streams.first().url  
 
 def getValidUrl(url):
