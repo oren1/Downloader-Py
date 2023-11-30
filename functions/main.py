@@ -8,6 +8,7 @@ from pytube import YouTube, exceptions
 from urllib.parse import unquote
 import json
 from flask import jsonify 
+import re
 
 initialize_app()
 
@@ -41,7 +42,6 @@ def get_download_url(req: https_fn.Request) -> https_fn.Response:
 
     # the url is sent encoded so we need to decode it
     originalUrl = unquote(encodedOriginalUrl)
-    
     # get a downloadable url
     try:
         downloadUrl = getDownloadUrl(originalUrl, quality)
@@ -55,9 +55,18 @@ def get_download_url(req: https_fn.Request) -> https_fn.Response:
     
 
 def getDownloadUrl(url, resolution = '360p'):
-        streams = YouTube(url).streams
+        validUrl = getValidUrl(url)
+        print('validUrl', validUrl)
+        streams = YouTube(validUrl).streams
+        print('have streams')
         for stream in streams:
             if (stream.mime_type == 'video/mp4' and stream.resolution == resolution and stream.is_progressive == True):
                 return stream.url
 
-
+def getValidUrl(url):
+     if 'youtu.be' in url:
+        splits = re.split("youtu.be\/|\?", url)
+        videoId = splits[1]
+        return f'https://youtube.com/watch?v={videoId}'
+     else:
+         return url   
