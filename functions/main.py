@@ -23,6 +23,7 @@ def get_download_url(req: https_fn.Request) -> https_fn.Response:
         if request_json and "url" in request_json:
             encodedOriginalUrl = request_json.get('url')
             quality = request_json.get('quality')
+       
 
     elif content_type == "application/x-www-form-urlencoded":       
          if req.method == 'POST':
@@ -40,12 +41,10 @@ def get_download_url(req: https_fn.Request) -> https_fn.Response:
     if quality is None:
         quality = '720p'
 
-
-    # the url is sent encoded so we need to decode it
-    originalUrl = unquote(encodedOriginalUrl)
+    
     # get a downloadable url
     try:
-        downloadUrl = getDownloadUrl(originalUrl, quality)
+        downloadUrl = getDownloadUrl(encodedOriginalUrl, quality)
     except exceptions.AgeRestrictedError:
         return https_fn.Response(json.dumps({'error': 'this video is age restricted, and can`t be accessed'}))
     except:
